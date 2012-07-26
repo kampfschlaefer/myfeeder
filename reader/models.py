@@ -6,6 +6,7 @@ import datetime
 
 class Posting(models.Model):
     feed = models.ForeignKey('Feed')
+    origid = models.CharField(max_length=250,blank=True)
     title = models.CharField(max_length=250)
     link = models.URLField(blank=True)
     content = models.TextField()
@@ -15,6 +16,9 @@ class Posting(models.Model):
 class Feed(models.Model):
     url = models.URLField()
     title = models.CharField(max_length=250)
+
+    def __unicode__(self):
+        return self.title
 
 class Enclosures(models.Model):
     posting = models.ForeignKey('Posting')

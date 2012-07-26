@@ -8,6 +8,10 @@ class FeedAdmin(admin.ModelAdmin):
     pass
 
 class PostingAdmin(admin.ModelAdmin):
+    list_display = ['feed', 'title', 'publishdate']
+    list_display_links = ['title', ]
+    list_filter = ['feed', 'author']
+    ordering = ['publishdate', 'feed']
     pass
 
 admin.site.register(Feed, FeedAdmin)
