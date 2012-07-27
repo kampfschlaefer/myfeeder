@@ -1,0 +1,38 @@
+{% extends 'reader/base.html' %}
+
+{% block header %}
+{{block.super}}
+<script type="text/javascript" src="{{ STATIC_URL }}jquery-1.7.1.min.js" ></script>
+<script type="text/javascript" src="{{ STATIC_URL }}jquery-ui-1.8.18.custom.min.js"></script>
+{% endblock %}
+
+{% block bottomscript %}
+{{block.super}}
+<script type="text/javascript">
+	function updatefeedlist(data) {
+		$('#feedlist').empty();
+		for(feed in data.feed_list) {
+			$('#feedlist').append('<div class="feed">'+data.feed_list[feed].title+'</div>');
+		}
+	}
+	$.ajax({
+		url: 'feedlist',
+		method: 'GET',
+		datatype: 'json',
+		success: updatefeedlist
+		});
+</script>
+{% endblock %}
+
+{% block sidebar %}
+<div id="feedlist">
+	Feedlist
+</div>
+{% endblock %}
+
+{% block content %}
+Content
+<div id="output">
+	Output
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+<html>
+	<head>
+		<title>Reader</title>
+		{% block header %}
+		{% endblock %}
+		<style type="text/css">
+			body {
+				font-family: Helvetica,"Sans Serif",sans;
+			}
+			div {
+				border: outset 1px #ccc;
+				margin: 2px;
+			}
+			#sidebar {
+				float: left;
+				width: 200px;
+				border-style: inset;
+			}
+			#content {
+				/*float: left;
+				width: 800px;*/
+				margin-left: 220px;
+				border-style: inset;
+			}
+		</style>
+	</head>
+	<body>
+
+		<h1>{{pagetitle}}</h1>
+
+		<div id="sidebar">
+			{% block sidebar %}
+			{% endblock %}
+		</div>
+		<div id="content">
+			{% block content %}
+			{% endblock %}
+		</div>
+
+		{% block footer %}
+		{% endblock %}
+
+		{% block bottomscript %}
+		{% endblock %}
+
+	</body>
+</html>
+

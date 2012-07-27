@@ -1,0 +1,23 @@
+{% extends 'reader/base.html' %}
+
+{% block content %}
+<div id="postlist">
+	{% for post in object_list %}
+	<div class="postitem">
+		<div class="postheader">
+			<h3><a href="{{post.link}}" target="_blank">{{post.title}}</a></h3>
+		</div>
+		<div class="postcontent">
+			{% autoescape off %}
+			{{post.content}}
+			{% endautoescape %}
+		</div>
+		<div class="postdetails">
+			{{post.author}}
+			{{post.publishdate}}
+		</div>
+	</div>
+	{% endfor %}
+</div>
+
+{% endblock %}
