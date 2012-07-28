@@ -27,7 +27,7 @@
 		$('#postlist').empty();
 		for( i in data ) {
 			p = data[i];
-			$('#postlist').append('<div class="post"><div class="postheader">'+p.title+'</div><div class="postcontent">'+p.content+'</div><div class="postfooter">'+p.author+' on '+p.publishdate+'</div></div>');
+			$('#postlist').append('<div class="post"><div class="postheader"><a href="'+p.link+'">'+p.title+'<div style="float:right; border: 0px;">Goto</div></a></div><div class="postcontent">'+p.content+'</div><div class="postfooter">'+p.author+' on '+p.publishdate+' - '+p.enclosures+'</div></div>');
 		}
 	}
 	function getposts() {
@@ -60,22 +60,27 @@
 		}
 		return ret;
 	}
-	function updatefeedlist(data, textstatus, jqXHR) {
+	function getfeedlist(data, textstatus, jqXHR) {
 		$('#feedlistcontent').empty();
 		$('#feedlistcontent').append(parsefeedlist(data));
 	}
-	$.ajax({
-		url: 'ajaxfeedlist',
-		method: 'GET',
-		datatype: 'json',
-		success: updatefeedlist
-		});
+	function updatefeedlist() {
+		$.ajax({
+			url: 'ajaxfeedlist',
+			method: 'GET',
+			datatype: 'json',
+			success: getfeedlist
+			});
+	};
+	$(document).ready(function() {
+			updatefeedlist();
+			});
 </script>
 {% endblock %}
 
 {% block sidebar %}
 <div id="feedlist">
-	<div id="feedlistheader"><a href="javascript:getposts();">All Feeds</a></div>
+	<div id="feedlistheader"><a href="javascript:updatefeedlist();">Update Feed List</a><br><a href="javascript:getposts();">All Feeds</a></div>
 	<div id="feedlistcontent"></div>
 </div>
 {% endblock %}
