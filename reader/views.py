@@ -20,6 +20,7 @@ class IndexView(TemplateView):
     template_name = "reader/index.html"
 
     def get_context_data(self, **kwargs):
-        print kwargs.update({'pagetitle': 'My feed reader', })
-        return kwargs.update({'pagetitle': 'My feed reader', })
+        print "IndexView.get_context_data()"
+        print kwargs #.update({'pagetitle': 'My feed reader', })
+        return {'pagetitle': 'My feed reader', }
 

@@ -4,19 +4,68 @@
 {{block.super}}
 <script type="text/javascript" src="{{ STATIC_URL }}jquery-1.7.1.min.js" ></script>
 <script type="text/javascript" src="{{ STATIC_URL }}jquery-ui-1.8.18.custom.min.js"></script>
+<style type="text/css">
+	div.category {
+		border-color: red;
+	}
+	div.feed {
+		border-width: 0px;
+		background-color: #eee;
+	}
+	#feedlist { border-width: 0px; }
+	#feedlistcontent { border-width: 0px; }
+</style>
 {% endblock %}
 
 {% block bottomscript %}
 {{block.super}}
 <script type="text/javascript">
-	function updatefeedlist(data) {
-		$('#feedlist').empty();
-		for(feed in data.feed_list) {
-			$('#feedlist').append('<div class="feed">'+data.feed_list[feed].title+'</div>');
+	var mydata='';
+	function parseposts(data) {
+		//alert("Received "+data.length+" posts");
+		mydata = data;
+		$('#postlist').empty();
+		for( i in data ) {
+			p = data[i];
+			$('#postlist').append('<div class="post"><div class="postheader">'+p.title+'</div><div class="postcontent">'+p.content+'</div><div class="postfooter">'+p.author+' on '+p.publishdate+'</div></div>');
 		}
 	}
+	function getposts() {
+		//alert("Called getposts " + id + ', ' + cat);
+		$.ajax({
+			url: 'ajaxpostlist',
+			method: 'GET',
+			datatype: 'json',
+			success: parseposts,
+			});
+	}
+	function getposts(id, cat) {
+		//alert("Called getposts " + id + ', ' + cat);
+		$.ajax({
+			url: 'ajaxpostlist?type='+cat+'&id='+id,
+			method: 'GET',
+			datatype: 'json',
+			success: parseposts,
+			});
+	}
+	function parsefeedlist(data) {
+		ret = ''
+		for( i in data ) {
+			f = data[i];
+			ret += '<div class="'+f.type+'"><a href="javascript:getposts('+f.id+',\''+f.type+'\');">'+f.title+'</a>';
+			if( f.childs ) {
+				ret += parsefeedlist(f.childs);
+			}
+			ret += '</div>';
+		}
+		return ret;
+	}
+	function updatefeedlist(data, textstatus, jqXHR) {
+		$('#feedlistcontent').empty();
+		$('#feedlistcontent').append(parsefeedlist(data));
+	}
 	$.ajax({
-		url: 'feedlist',
+		url: 'ajaxfeedlist',
 		method: 'GET',
 		datatype: 'json',
 		success: updatefeedlist
@@ -26,13 +75,12 @@
 
 {% block sidebar %}
 <div id="feedlist">
-	Feedlist
+	<div id="feedlistheader"><a href="javascript:getposts();">All Feeds</a></div>
+	<div id="feedlistcontent"></div>
 </div>
 {% endblock %}
 
 {% block content %}
-Content
-<div id="output">
-	Output
-</div>
+Posts
+<div id="postlist"></div>
 {% endblock %}
