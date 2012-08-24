@@ -13,6 +13,11 @@ class Posting(models.Model):
     author = models.CharField(max_length=250, blank=True)
     publishdate = models.DateTimeField(default=datetime.datetime.now())
 
+    def isread(self):
+        return (self.marks.filter(mark='READ').count() > 0)
+    def isstarred(self):
+        return (self.marks.filter(mark='STAR').count() > 0)
+
 class Feed(models.Model):
     url = models.URLField()
     title = models.CharField(max_length=250)

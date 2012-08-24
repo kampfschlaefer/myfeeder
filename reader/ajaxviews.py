@@ -56,7 +56,7 @@ class JSONResponseMixin(object):
         return json.dumps(context, cls=JSONDateTimeEncoder)
 
 class JSONFeedList(JSONResponseMixin, View):
-    #queryset = Feed.objects.all().values()
+
     def categoriestolist(self, cats):
         ret = []
         for c in cats:
@@ -78,17 +78,20 @@ class JSONFeedList(JSONResponseMixin, View):
         return ret
 
     def get(self, request, *args, **kwargs):
-        print "Called get()"
+        #print "Called get()"
         l = self.buildcategoriestree(None)
-        print l
+        #print l
 
         return self.render_to_response(l)
 
     pass
 
 class JSONPostList(JSONResponseMixin, View):
+
     def get(self, request, *args, **kwargs):
-        print request.GET
+        #print request.GET
+        #print args
+        #print kwargs
         queryset = None
         q = Q()
         if request.GET.has_key('type') and request.GET.has_key('id'):
@@ -100,9 +103,19 @@ class JSONPostList(JSONResponseMixin, View):
                 q = Q(feed__in=feeds)
             if t == 'feed':
                 q = Q(feed__pk=i)
-        queryset = Posting.objects.filter(q).order_by('-publishdate').values()
+        queryset = Posting.objects.filter(q).order_by('-publishdate')#.values()#'id', 'title', 'link', 'content', 'author', 'publishdate', 'enclosures')
+        ret = []
+        for p in queryset:
+            tmp = {}
+            for field in ('id', 'title', 'link', 'content', 'author', 'publishdate'):
+                tmp[field] = p.serializable_value(field)
+            for call in ('isread', 'isstarred'):
+                tmp[call] = eval('p.%s()' % call)
+            #for m in p.marks.all():
+            tmp['marks'] = p.marks.count()
+            ret.append(tmp)
+        print "queryset: ", queryset[:1]
+        print "ret: ", ret[:2]
 
-        print args
-        print kwargs
-        return self.render_to_response(queryset)
+        return self.render_to_response(ret)#queryset)
 

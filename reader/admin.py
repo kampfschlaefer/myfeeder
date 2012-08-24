@@ -12,14 +12,18 @@ class EnclosureInlineAdmin(admin.StackedInline):
     model = Enclosure
     extra = 0
 
+class MarkInlineAdmin(admin.TabularInline):
+    model = PostMark
+    extra = 1
+
 
 class PostingAdmin(admin.ModelAdmin):
-    list_display = ['feed', 'title', 'publishdate']
+    list_display = ['feed', 'title', 'publishdate', 'isread', 'isstarred']
     list_display_links = ['title', ]
-    list_filter = ['feed', 'author', 'feed__category']
+    list_filter = ['feed', 'author', 'feed__category', 'marks__mark' ]
     ordering = ['publishdate', 'feed']
 
-    inlines = [ EnclosureInlineAdmin, ]
+    inlines = [ EnclosureInlineAdmin, MarkInlineAdmin ]
 
 class EnclosureAdmin(admin.ModelAdmin):
     list_display = ['posting', 'etype', 'length', 'href']

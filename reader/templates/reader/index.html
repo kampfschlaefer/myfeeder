@@ -27,7 +27,11 @@
 		$('#postlist').empty();
 		for( i in data ) {
 			p = data[i];
-			$('#postlist').append('<div class="post"><div class="postheader"><a href="'+p.link+'">'+p.title+'<div style="float:right; border: 0px;">Goto</div></a></div><div class="postcontent">'+p.content+'</div><div class="postfooter">'+p.author+' on '+p.publishdate+' - '+p.enclosures+'</div></div>');
+			pelem  = '<div class="post">';
+			pelem += '<div class="postheader"><a href="'+p.link+'"><div style="float:right; border: 0px;">Goto</div><h3>'+p.title+'</h3></a></div>';
+			pelem += '<div class="postcontent">'+p.content+'</div>';
+			pelem += '<div class="postfooter">'+p.author+' on '+p.publishdate+' - '+(p.isread?'Read':'New')+' '+(p.isstarred?'Starred':'Unstarred')+'</div></div>';
+			$('#postlist').append(pelem);
 		}
 	}
 	function getposts() {
