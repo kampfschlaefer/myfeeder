@@ -27,6 +27,7 @@ def parsefeed(feed):
     print feed.entries[0].keys()
     #print feed.entries[:2]
 
+    newentries = 0
     for entry in feed.entries:
         origid = entry.id
         if Posting.objects.filter(feed__pk=f.id, origid=origid).count() == 0:
@@ -34,6 +35,8 @@ def parsefeed(feed):
             t = entry.updated_parsed
             p.publishdate = datetime.datetime(t.tm_year, t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec, 0, pytz.utc)
             p.save()
+            newentries += 1
+    print "Imported {} new entries from {}".format(newentries, f)
 
 
 if __name__ == '__main__':
