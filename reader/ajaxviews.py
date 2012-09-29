@@ -2,7 +2,7 @@
 
 from django import http
 #from django.utils import simplejson as json
-import json, datetime
+import json, datetime, re
 from django.db.models import Q
 from django.views.generic.list import BaseListView
 from django.views.generic.base import View
@@ -103,11 +103,12 @@ class JSONPostList(JSONResponseMixin, View):
                 q = Q(feed__in=feeds)
             if t == 'feed':
                 q = Q(feed__pk=i)
-        queryset = Posting.objects.filter(q).order_by('-publishdate')#.values()#'id', 'title', 'link', 'content', 'author', 'publishdate', 'enclosures')
+        queryset = Posting.objects.filter(q).order_by('-publishdate')[:20]#.values()#'id', 'title', 'link', 'content', 'author', 'publishdate', 'enclosures')
         ret = []
         for p in queryset:
             tmp = {}
-            for field in ('id', 'title', 'link', 'content', 'author', 'publishdate'):
+            tmp['content'] = re.sub('class', 'xclass', p.serializable_value('content'))
+            for field in ('id', 'title', 'link', 'author', 'publishdate'):
                 tmp[field] = p.serializable_value(field)
             for call in ('isread', 'isstarred'):
                 tmp[call] = eval('p.%s()' % call)

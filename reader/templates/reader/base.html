@@ -1,6 +1,9 @@
 <html>
 	<head>
 		<title>Reader</title>
+		<link type="text/css" href="{{STATIC_URL}}/jquery-ui-1.8.24/css/smoothness/jquery-ui-1.8.24.custom.css" rel="Stylesheet" />
+		<script type="text/javascript" src="{{STATIC_URL}}/jquery-ui-1.8.24/js/jquery-1.8.0.min.js"></script>
+		<script type="text/javascript" src="{{STATIC_URL}}/jquery-ui-1.8.24/js/jquery-ui-1.8.24.custom.min.js"></script>
 		{% block header %}
 		{% endblock %}
 		<style type="text/css">
@@ -11,14 +14,16 @@
 				border: outset 1px #ccc;
 				margin: 2px;
 			}
+			#header {
+				margin-left: 220px;
+			}
 			#sidebar {
 				float: left;
 				width: 200px;
 				border-style: inset;
+				position: fixed;
 			}
 			#content {
-				/*float: left;
-				width: 800px;*/
 				margin-left: 220px;
 				border-style: inset;
 			}
@@ -27,7 +32,9 @@
 	<body>
 
 		<div style="float:right; width: 100px;"><a href="/admin">Admin</a></div>
-		<h1>{{pagetitle}}</h1>
+		<div id="header">
+			<h1>{{pagetitle}}</h1>
+		</div>
 
 		<div id="sidebar">
 			{% block sidebar %}

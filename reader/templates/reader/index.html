@@ -2,8 +2,7 @@
 
 {% block header %}
 {{block.super}}
-<script type="text/javascript" src="{{ STATIC_URL }}jquery-1.7.1.min.js" ></script>
-<script type="text/javascript" src="{{ STATIC_URL }}jquery-ui-1.8.18.custom.min.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}/masonry-site/jquery.masonry.js"></script>
 <style type="text/css">
 	div.category {
 		border-color: red;
@@ -14,6 +13,42 @@
 	}
 	#feedlist { border-width: 0px; }
 	#feedlistcontent { border-width: 0px; }
+	#content {
+		padding: 0px;
+		border: 0px;
+	}
+	#postlist { border: 0px; }
+	div.post {
+		width: 300px;
+		border: 0px;
+		margin: 0px;
+		padding: 0px;
+		margin-bottom: 1em;
+	}
+	div.postheader {
+		margin: 0px;
+		padding: 0.3em;
+		border: solid 1px #aaaaaa;
+	}
+	div.postcontent {
+		margin: 0px;
+		padding: 0.5em;
+		border: solid 1px #aaaaaa;
+		border-top: 0;
+		border-bottom: 0;
+	}
+	div.postcontent div {
+		border: 0px;
+	}
+	div.postcontent img {
+	}
+	div.postfooter {
+		margin: 0px;
+		padding: 0.3em;
+		border: solid 1px #aaaaaa;
+		clear: both;
+		font-size: small;
+	}
 </style>
 {% endblock %}
 
@@ -24,20 +59,25 @@
 	function parseposts(data) {
 		//alert("Received "+data.length+" posts");
 		mydata = data;
-		$('#postlist').empty();
+		$('#postlist').empty().masonry('reload');
 		for( i in data ) {
-			p = data[i];
-			pelem  = '<div class="post">';
-			pelem += '<div class="postheader"><a href="'+p.link+'"><div style="float:right; border: 0px;">Goto</div><h3>'+p.title+'</h3></a></div>';
-			pelem += '<div class="postcontent">'+p.content+'</div>';
-			pelem += '<div class="postfooter">'+p.author+' on '+p.publishdate+' - '+(p.isread?'Read':'New')+' '+(p.isstarred?'Starred':'Unstarred')+'</div></div>';
-			$('#postlist').append(pelem);
+			var p = data[i];
+			var $post = $([
+					'<div class="post" id="post'+p.id+'">',
+					'<div class="postheader ui-corner-top ui-widget-header">',
+						'<a href="'+p.link+'" target="_blank"><div class="ui-icon ui-icon-circle-arrow-e" style="float:right; border: 0px;">Goto</div>'+p.title+'</a>',
+					'</div>',
+					'<div class="postcontent">'+p.content+'</div>',
+					'<div class="postfooter ui-corner-bottom">'+p.author+' on '+p.publishdate+' - '+(p.isread?'Read':'New')+' '+(p.isstarred?'Starred':'Unstarred')+'</div></div>'
+					].join('\n'));
+			$('#postlist').append($post).masonry('appended', $post);
 		}
+		//$('#postlist').appended();
 	}
 	function getposts() {
 		//alert("Called getposts " + id + ', ' + cat);
 		$.ajax({
-			url: 'ajaxpostlist',
+			url: '/reader/ajaxpostlist',
 			method: 'GET',
 			datatype: 'json',
 			success: parseposts,
@@ -46,7 +86,7 @@
 	function getposts(id, cat) {
 		//alert("Called getposts " + id + ', ' + cat);
 		$.ajax({
-			url: 'ajaxpostlist?type='+cat+'&id='+id,
+			url: '/reader/ajaxpostlist?type='+cat+'&id='+id,
 			method: 'GET',
 			datatype: 'json',
 			success: parseposts,
@@ -56,7 +96,7 @@
 		ret = ''
 		for( i in data ) {
 			f = data[i];
-			ret += '<div class="'+f.type+'"><a href="javascript:getposts('+f.id+',\''+f.type+'\');">'+f.title+'</a>';
+			ret += '<div class="'+f.type+'"><a href="/reader/'+f.type+'/'+f.id+'" ref="javascript:getposts('+f.id+',\''+f.type+'\');">'+f.title+'</a>';
 			if( f.childs ) {
 				ret += parsefeedlist(f.childs);
 			}
@@ -70,26 +110,67 @@
 	}
 	function updatefeedlist() {
 		$.ajax({
-			url: 'ajaxfeedlist',
+			url: '/reader/ajaxfeedlist',
 			method: 'GET',
 			datatype: 'json',
 			success: getfeedlist
 			});
 	};
+	function executeurl(url, push) {
+		push = typeof push !== 'undefined' ? push : true;
+		s = /(feed|category)\/(\d+)/.exec(url);
+		if( s && s.length > 1 ) {
+			getposts(s[2], s[1]);
+		} else {
+			getposts();
+		}
+		if(push && window.history.pushState) {
+			window.history.pushState({'state': url}, url, url);
+		}
+	}
+	window.onpopstate = function(event) {
+		if(event.state && event.state.state) {
+			executeurl(event.state.state, false);
+		}
+	}
 	$(document).ready(function() {
 			updatefeedlist();
-			});
+			$('#postlist').masonry({
+				itemSelector: '.post',
+				//columnWidth: 360,
+				columnWidth: function(containerWidth) {
+					windowwidth = $('#postlist').innerWidth()-20; // - $('#content').css('margin-left');
+					var w = Math.floor(windowwidth / 300);
+					$('#columns').empty().append(w+' columns');
+					$('.post').css('width', windowwidth/w - w*5);
+					$('#postwidth').empty().append('post width: ' + (windowwidth/w - w*5));
+					$('#columnwidth').empty().append('column width: '+(windowwidth/w-w));
+					return windowwidth/w-w;
+					},
+				});
+			$('#feedlistcontent a').live('click', function(event) {
+					executeurl(this.href);
+					event.preventDefault();
+					return false;
+				});
+			executeurl(document.URL);
+		});
 </script>
 {% endblock %}
 
 {% block sidebar %}
 <div id="feedlist">
-	<div id="feedlistheader"><a href="javascript:updatefeedlist();">Update Feed List</a><br><a href="javascript:getposts();">All Feeds</a></div>
+	<div id="feedlistheader">
+		<a href="javascript:updatefeedlist();">Update Feed List</a>
+		<br>
+		<a href="/reader/" ref="javascript:getposts();">All Feeds</a>
+	</div>
 	<div id="feedlistcontent"></div>
 </div>
 {% endblock %}
 
 {% block content %}
-Posts
+<div style="font-size: 75%;"><span id="columns"></span> <span id="columnwidth"></span> <span id="postwidth"></span></div>
+<!--Posts-->
 <div id="postlist"></div>
 {% endblock %}
