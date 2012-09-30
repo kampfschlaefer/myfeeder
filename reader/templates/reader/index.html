@@ -19,7 +19,7 @@
 	}
 	#postlist { border: 0px; }
 	div.post {
-		width: 300px;
+		width: 100%;
 		border: 0px;
 		margin: 0px;
 		padding: 0px;
@@ -36,6 +36,7 @@
 		border: solid 1px #aaaaaa;
 		border-top: 0;
 		border-bottom: 0;
+		overflow: hidden;
 	}
 	div.postcontent div {
 		border: 0px;
@@ -55,48 +56,23 @@
 {% block bottomscript %}
 {{block.super}}
 <script type="text/javascript">
-	var mydata='';
+	function imgloaded() {
+		$('#postlist').masonry('reload');
+		//alert($('img').width());
+	}
 	function parseposts(data) {
-		//alert("Received "+data.length+" posts");
-		mydata = data;
 		$('#postlist').empty().masonry('reload');
-		for( i in data ) {
-			var p = data[i];
-			var $post = $([
-					'<div class="post" id="post'+p.id+'">',
-					'<div class="postheader ui-corner-top ui-widget-header">',
-						'<a href="'+p.link+'" target="_blank"><div class="ui-icon ui-icon-circle-arrow-e" style="float:right; border: 0px;">Goto</div>'+p.title+'</a>',
-					'</div>',
-					'<div class="postcontent">'+p.content+'</div>',
-					'<div class="postfooter ui-corner-bottom">'+p.author+' on '+p.publishdate+' - '+(p.isread?'Read':'New')+' '+(p.isstarred?'Starred':'Unstarred')+'</div></div>'
-					].join('\n'));
-			$('#postlist').append($post).masonry('appended', $post);
-		}
-		//$('#postlist').appended();
-	}
-	function getposts() {
-		//alert("Called getposts " + id + ', ' + cat);
-		$.ajax({
-			url: '/reader/ajaxpostlist',
-			method: 'GET',
-			datatype: 'json',
-			success: parseposts,
-			});
-	}
-	function getposts(id, cat) {
-		//alert("Called getposts " + id + ', ' + cat);
-		$.ajax({
-			url: '/reader/ajaxpostlist?type='+cat+'&id='+id,
-			method: 'GET',
-			datatype: 'json',
-			success: parseposts,
-			});
+		var posts = $(data).find('.post');
+		//$('#postlist').append(posts).masonry('appended', posts);
+		$('#postlist').append(posts).masonry('reload');
+		$('#pagination').replaceWith($(data).find('#pagination'));
+		$('img').load(imgloaded);
 	}
 	function parsefeedlist(data) {
 		ret = ''
 		for( i in data ) {
 			f = data[i];
-			ret += '<div class="'+f.type+'"><a href="/reader/'+f.type+'/'+f.id+'" ref="javascript:getposts('+f.id+',\''+f.type+'\');">'+f.title+'</a>';
+			ret += '<div class="'+f.type+'"><a href="/reader/'+f.type+'/'+f.id+'" >'+f.title+'</a>';
 			if( f.childs ) {
 				ret += parsefeedlist(f.childs);
 			}
@@ -118,12 +94,12 @@
 	};
 	function executeurl(url, push) {
 		push = typeof push !== 'undefined' ? push : true;
-		s = /(feed|category)\/(\d+)/.exec(url);
-		if( s && s.length > 1 ) {
-			getposts(s[2], s[1]);
-		} else {
-			getposts();
-		}
+		$.ajax({
+			url: url,
+			method: 'GET',
+			datatype: 'html',
+			success: parseposts,
+			});
 		if(push && window.history.pushState) {
 			window.history.pushState({'state': url}, url, url);
 		}
@@ -135,6 +111,7 @@
 	}
 	$(document).ready(function() {
 			updatefeedlist();
+			$('.post').css('width', '300px');
 			$('#postlist').masonry({
 				itemSelector: '.post',
 				//columnWidth: 360,
@@ -148,12 +125,17 @@
 					return windowwidth/w-w;
 					},
 				});
-			$('#feedlistcontent a').live('click', function(event) {
+			$('#getallposts').bind('click', function(event) {
 					executeurl(this.href);
 					event.preventDefault();
 					return false;
 				});
-			executeurl(document.URL);
+			$('#feedlistcontent a, #pagination a').live('click', function(event) {
+					executeurl(this.href);
+					event.preventDefault();
+					return false;
+				});
+			$('img').load(imgloaded);
 		});
 </script>
 {% endblock %}
@@ -163,7 +145,7 @@
 	<div id="feedlistheader">
 		<a href="javascript:updatefeedlist();">Update Feed List</a>
 		<br>
-		<a href="/reader/" ref="javascript:getposts();">All Feeds</a>
+		<a href="/reader/" id='getallposts'>All Feeds</a>
 	</div>
 	<div id="feedlistcontent"></div>
 </div>
@@ -172,5 +154,5 @@
 {% block content %}
 <div style="font-size: 75%;"><span id="columns"></span> <span id="columnwidth"></span> <span id="postwidth"></span></div>
 <!--Posts-->
-<div id="postlist"></div>
+{% include 'reader/postlist.html' %}
 {% endblock %}

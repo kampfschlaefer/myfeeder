@@ -3,24 +3,54 @@
 
 from django.views.generic.list import ListView
 from django.views.generic import TemplateView
-from reader import models
+from django.db.models import Q
+from reader.models import *
 
-class PostList(ListView):
+class PostListMixin:
+    def get_postlist(self, category=None, feed=None):
+        q = Q()
+        if category is not None:
+            q = Q(feed__in=Category.objects.get(pk=int(category)).getfeeds())
+        if feed is not None:
+            q = Q(feed__pk=int(feed))
+        queryset = Posting.objects.filter(q).order_by('-publishdate')
+        return queryset
 
-    #queryset = models.Posting.objects.all()
-    model = models.Posting
+#class PostList(ListView):
+#
+#    #queryset = models.Posting.objects.all()
+#    model = Posting
+#
+#    def get_context_data(self, **kwargs):
+#        ret = kwargs
+#        ret['pagetitle'] = 'All Postings'
+#        return ret
 
-    def get_context_data(self, **kwargs):
-        ret = kwargs
-        ret['pagetitle'] = 'All Postings'
-        return ret
-
-class IndexView(TemplateView):
+class IndexView(TemplateView, PostListMixin):
 
     template_name = "reader/index.html"
 
     def get_context_data(self, **kwargs):
-        print "IndexView.get_context_data(", kwargs, ")"
-        print kwargs #.update({'pagetitle': 'My feed reader', })
-        return {'pagetitle': 'My feed reader', }
+        #print "IndexView.get_context_data(", kwargs, ")"
+        postsperpage = 25
+        category = None
+        feed = None
+        page = 1
+        nextpagelink = '/reader'
+        if kwargs.has_key('category'):
+            category = int(kwargs['category'])
+            nextpagelink += '/category/{}'.format(category)
+        if kwargs.has_key('feed'):
+            feed = int(kwargs['feed'])
+            nextpagelink += '/feed/{}'.format(feed)
+        if kwargs.has_key('page'):
+            page = int(kwargs['page'])
+        nextpagelink += '/page/{}'.format(page+1)
+        postlist = self.get_postlist(category=category, feed=feed)[(page-1)*postsperpage:page*postsperpage]
+        return {
+                'pagetitle': 'My feed reader',
+                'postlist': postlist,
+                'page': page,
+                'nextpagelink': nextpagelink
+                }
 
