@@ -107,7 +107,7 @@ class JSONPostList(JSONResponseMixin, View):
         ret = []
         for p in queryset:
             tmp = {}
-            tmp['content'] = re.sub('class', 'xclass', p.serializable_value('content'))
+            tmp['content'] = re.sub('(class|div)', 'x\\1', p.serializable_value('content'))
             for field in ('id', 'title', 'link', 'author', 'publishdate'):
                 tmp[field] = p.serializable_value(field)
             for call in ('isread', 'isstarred'):
@@ -115,8 +115,8 @@ class JSONPostList(JSONResponseMixin, View):
             #for m in p.marks.all():
             tmp['marks'] = p.marks.count()
             ret.append(tmp)
-        print "queryset: ", queryset[:1]
-        print "ret: ", ret[:2]
+        #print "queryset: ", queryset[:1]
+        #print "ret: ", ret[:2]
 
         return self.render_to_response(ret)#queryset)
 
