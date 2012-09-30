@@ -10,7 +10,7 @@ sys.path.insert(0, '.')
 
 from reader.models import *
 from django.db import connection, transaction, utils
-import feedparser, pytz
+import feedparser, pytz, zlib
 
 def parsefeed(feed):
     if isinstance(feed, str):
@@ -29,10 +29,20 @@ def parsefeed(feed):
 
     newentries = 0
     for entry in feed.entries:
-        origid = entry.id
+        try:
+            origid = entry.id
+        except AttributeError:
+            origid = zlib.adler32(entry.link)
         if Posting.objects.filter(feed__pk=f.id, origid=origid).count() == 0:
-            p = Posting(feed=f, origid=origid, title=entry.title, content=entry.summary, link=entry.link, author=entry.author)
-            t = entry.updated_parsed
+            try:
+                author = entry.author
+            except AttributeError:
+                author = None
+            p = Posting(feed=f, origid=origid, title=entry.title, content=entry.summary, link=entry.link, author=author)
+            try:
+                t = entry.updated_parsed
+            except AttributeError:
+                t = feed.updated_parsed
             p.publishdate = datetime.datetime(t.tm_year, t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec, 0, pytz.utc)
             p.save()
             newentries += 1
