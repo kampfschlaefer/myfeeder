@@ -134,6 +134,7 @@ INSTALLED_APPS = (
     #'mptt',
     #'feincms.module.page',
     #'feincms.module.medialibrary',
+    'django_extensions',
 
     # My apps
     'reader',

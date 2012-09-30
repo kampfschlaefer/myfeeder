@@ -17,6 +17,8 @@ def parsefeed(feed):
         f = Feed.objects.get(url=feed)
     if isinstance(feed, int):
         f = Feed.objects.get(pk=feed)
+    if isinstance(feed, Feed):
+        f = feed
     #else:
     #    f = Feed.objects.get(feed)
     print f
