@@ -33,6 +33,12 @@ class Feed(models.Model):
     def __unicode__(self):
         return self.title
 
+    def unread(self):
+        #print "Feed ({}).unread will give {}.".format(self, len(filter(lambda p: not p.isread(), self.posting_set.all())))
+        print "Feed ({}).unread will give {}.".format(self, self.posting_set.filter(~models.Q(marks__mark='READ')).count())
+        #return len(filter(lambda p: not p.isread(), self.posting_set.all()))
+        return self.posting_set.filter(~models.Q(marks__mark='READ')).count()
+
 class Enclosure(models.Model):
     posting = models.ForeignKey('Posting', related_name='enclosures')
     etype = models.CharField(max_length=200)
@@ -56,6 +62,16 @@ class Category(MPTTModel):
             feedlist += [ f for f in c.getfeeds() ]
 
         return feedlist
+
+    def unread(self):
+        u = 0
+        for c in self.get_children():
+            #print "Getting unread for ", c
+            u += c.unread()
+        for f in self.feeds.all():
+            u += f.unread()
+        #print " u is now ", u
+        return u
 
 class PostMark(models.Model):
     posting = models.ForeignKey(Posting, related_name='marks')

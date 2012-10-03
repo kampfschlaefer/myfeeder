@@ -1,10 +1,10 @@
 {% load mptt_tags %}
 <div id="feedlistcontent">
 	{% recursetree categories %}
-	<div class="category"><a href="/reader/category/{{ node.id }}">{{ node.title }}</a>
+	<div class="category"><a href="/reader/category/{{ node.id }}">{{ node.title }} ({{ node.unread }})</a>
 		{{ children }}
 		{% for feed in node.feeds.all %}
-		<div class="feed"><a href="/reader/feed/{{ feed.id }}">{{ feed.title }}</a></div>
+		<div class="feed"><a href="/reader/feed/{{ feed.id }}">{{ feed.title }} ({{ feed.unread }})</a></div>
 		{% endfor %}
 	</div>
 	{% endrecursetree %}
