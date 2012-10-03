@@ -32,7 +32,7 @@ class IndexView(TemplateView, PostListMixin):
 
     def get_context_data(self, **kwargs):
         #print "IndexView.get_context_data(", kwargs, ")"
-        postsperpage = 25
+        postsperpage = 50
         category = None
         feed = None
         page = 1
