@@ -1,6 +1,7 @@
 # vim: et ts=4 sw=4
 from django.db import models
-import datetime
+from mptt.models import MPTTModel, TreeForeignKey
+import datetime, re
 
 # Create your models here.
 
@@ -18,10 +19,16 @@ class Posting(models.Model):
     def isstarred(self):
         return (self.marks.filter(mark='STAR').count() > 0)
 
+    def displaywide(self):
+        if self.feed.wide_allowed and len(re.sub('<[^>]+>', '', self.content)) > 100:
+            return True
+        return False
+
 class Feed(models.Model):
     url = models.URLField()
     title = models.CharField(max_length=250)
-    category = models.ForeignKey('Category', related_name="feeds", blank=True, null=True)
+    category = TreeForeignKey('Category', related_name="feeds", blank=True, null=True)
+    wide_allowed = models.BooleanField(default=False, verbose_name="Allow big posts to display big")
 
     def __unicode__(self):
         return self.title
@@ -32,9 +39,12 @@ class Enclosure(models.Model):
     length = models.IntegerField(default=-1)
     href = models.URLField(blank=False)
 
-class Category(models.Model):
+class Category(MPTTModel):
     title = models.CharField(max_length=100)
-    parent = models.ForeignKey('Category', blank=True, null=True, related_name='subcategories')
+    parent = TreeForeignKey('self', blank=True, null=True, related_name='subcategories')
+
+    class MPTTMeta:
+        order_insertion_by = 'title'
 
     def __unicode__(self):
         return self.title

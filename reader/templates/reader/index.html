@@ -30,6 +30,11 @@
 		padding: 0.3em;
 		border: solid 1px #aaaaaa;
 	}
+	div.postheader a {
+		text-decoration: none;
+		/*font-weight: normal;*/
+		color: #333;
+	}
 	div.postcontent {
 		margin: 0px;
 		padding: 0.5em;
@@ -50,6 +55,13 @@
 		clear: both;
 		font-size: small;
 	}
+	#pagination {
+		position: fixed;
+		left: 10px;
+		bottom: 10px;
+		width: 200px;
+		border: 0px solid red;
+	}
 </style>
 {% endblock %}
 
@@ -68,7 +80,7 @@
 		$('#pagination').replaceWith($(data).find('#pagination'));
 		$('img').load(imgloaded);
 	}
-	function parsefeedlist(data) {
+	/*function parsefeedlist(data) {
 		ret = ''
 		for( i in data ) {
 			f = data[i];
@@ -79,8 +91,8 @@
 			ret += '</div>';
 		}
 		return ret;
-	}
-	function getfeedlist(data, textstatus, jqXHR) {
+	}*/
+	/*function getfeedlist(data, textstatus, jqXHR) {
 		$('#feedlistcontent').empty();
 		$('#feedlistcontent').append(parsefeedlist(data));
 	}
@@ -91,7 +103,7 @@
 			datatype: 'json',
 			success: getfeedlist
 			});
-	};
+	};*/
 	function executeurl(url, push) {
 		push = typeof push !== 'undefined' ? push : true;
 		$.ajax({
@@ -100,7 +112,7 @@
 			datatype: 'html',
 			success: parseposts,
 			});
-		if(push && window.history.pushState) {
+		if(push && window.history.pushState && url !== location.href) {
 			window.history.pushState({'state': url}, url, url);
 		}
 	}
@@ -110,7 +122,7 @@
 		}
 	}
 	$(document).ready(function() {
-			updatefeedlist();
+			//updatefeedlist();
 			$('.post').css('width', '300px');
 			$('#postlist').masonry({
 				itemSelector: '.post',
@@ -120,6 +132,7 @@
 					var w = Math.floor(windowwidth / 300);
 					$('#columns').empty().append(w+' columns');
 					$('.post').css('width', windowwidth/w - w*5);
+					$('#postlist .wide').css('width', windowwidth/w*2 - w*5);
 					$('#postwidth').empty().append('post width: ' + (windowwidth/w - w*5));
 					$('#columnwidth').empty().append('column width: '+(windowwidth/w-w));
 					return windowwidth/w-w;
@@ -143,11 +156,12 @@
 {% block sidebar %}
 <div id="feedlist">
 	<div id="feedlistheader">
-		<a href="javascript:updatefeedlist();">Update Feed List</a>
-		<br>
+		<!--<a href="javascript:updatefeedlist();">Update Feed List</a>
+		<br>-->
 		<a href="/reader/" id='getallposts'>All Feeds</a>
 	</div>
-	<div id="feedlistcontent"></div>
+	{#<div id="feedlistcontent"></div>#}
+	{% include 'reader/feedlist.html' %}
 </div>
 {% endblock %}
 

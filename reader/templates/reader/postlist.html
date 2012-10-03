@@ -1,11 +1,15 @@
 <div id="postlist">
 	{% for p in postlist %}
-	<div class="post" id="post'+p.id+'">
+	<div class="post {% if p.displaywide %}wide{% endif %}" id="post'+p.id+'">
 		<div class="postheader ui-corner-top ui-widget-header">
-			<a href="{{p.link}}" target="_blank"><div class="ui-icon ui-icon-circle-arrow-e" style="float:right; border: 0px;">Goto</div>{{p.title|striptags}}</a>
+			<a href="{{p.link}}" target="_blank"><div class="ui-icon ui-icon-circle-arrow-e" style="float:right; border: 0px;">Goto</div>{{p.title|striptags|safe}}</a>
 		</div>
 		<div class="postcontent">
-			{{ p.content|removetags:"div"|truncatewords_html:25|safe }}
+			{% if p.displaywide %}
+			{{ p.content|removetags:"div"|safe }}
+			{% else %}
+			{{ p.content|removetags:"div"|truncatewords_html:50|safe }}
+			{% endif %}
 			<div style="clear: both;"></div>
 		</div>
 		<div class="postfooter ui-corner-bottom">{{p.author}} on {{p.publishdate}} - {#(p.isread?'Read':'New')+' '+(p.isstarred?'Starred':'Unstarred')#}</div>
@@ -13,5 +17,13 @@
 	{% endfor %}
 </div>
 <div id="pagination">
-	This is page {{page}}. <a href="{{ nextpagelink }}">Next Page</a>
+	<table width="100%" >
+		<tr>
+			<td align="center">{% if previouspagelink|length > 0 %}<a href="{{ previouspagelink }}">Previous</a>{% else %}Previous{% endif %}</td>
+			<td align="center"><a href="{{ nextpagelink }}">Next Page</a></td>
+		</tr>
+		<tr>
+			<td colspan=2 align="center">This is page {{page}}.</td>
+		</tr>
+	</table>
 </div>

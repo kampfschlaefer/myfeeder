@@ -1,6 +1,7 @@
 # vim: et ts=4 sw=4
 
 from django.contrib import admin
+from mptt.admin import MPTTModelAdmin
 from reader.models import *
 
 class FeedAdmin(admin.ModelAdmin):
@@ -28,7 +29,7 @@ class PostingAdmin(admin.ModelAdmin):
 class EnclosureAdmin(admin.ModelAdmin):
     list_display = ['posting', 'etype', 'length', 'href']
 
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(MPTTModelAdmin):
     list_display = ['title', 'parent']
 
 admin.site.register(Feed, FeedAdmin)

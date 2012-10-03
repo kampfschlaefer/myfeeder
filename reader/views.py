@@ -45,12 +45,18 @@ class IndexView(TemplateView, PostListMixin):
             nextpagelink += '/feed/{}'.format(feed)
         if kwargs.has_key('page'):
             page = int(kwargs['page'])
+        previouspagelink = ''
+        if page > 1:
+            previouspagelink = '{}/page/{}'.format(nextpagelink, page-1)
         nextpagelink += '/page/{}'.format(page+1)
         postlist = self.get_postlist(category=category, feed=feed)[(page-1)*postsperpage:page*postsperpage]
+        #print [ p.displaywide() for p in postlist ]
         return {
                 'pagetitle': 'My feed reader',
                 'postlist': postlist,
                 'page': page,
-                'nextpagelink': nextpagelink
+                'nextpagelink': nextpagelink,
+                'previouspagelink': previouspagelink,
+                'categories': Category.objects.all(),
                 }
 
