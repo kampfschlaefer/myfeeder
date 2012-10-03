@@ -3,6 +3,7 @@
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+TEMPLATE_STRING_IF_INVALID='Invalid string'
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -131,7 +132,7 @@ INSTALLED_APPS = (
     # System-wide apps
     'south',
     #'feincms',
-    #'mptt',
+    'mptt',
     #'feincms.module.page',
     #'feincms.module.medialibrary',
     'django_extensions',
