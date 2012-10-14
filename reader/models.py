@@ -20,7 +20,7 @@ class Posting(models.Model):
         return (self.marks.filter(mark='STAR').count() > 0)
 
     def displaywide(self):
-        if self.feed.wide_allowed and len(re.sub('<[^>]+>', '', self.content)) > 100:
+        if self.feed.wide_allowed and not self.isread() and (len(re.sub('<[^>]+>', '', self.content)) > 100 or re.search('<img [^>]+>', self.content)):
             return True
         return False
 
