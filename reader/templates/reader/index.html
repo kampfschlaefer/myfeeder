@@ -51,7 +51,7 @@
 		border-bottom: 0;
 		overflow: hidden;
 	}
-	div.postread div.postcontent { display: none; }
+	/*div.postread div.postcontent { display: none; }*/
 	div.postcontent div {
 		border: 0px;
 	}
@@ -64,6 +64,7 @@
 		clear: both;
 		font-size: small;
 	}
+	div.postread div.postfooter a.markpost { display: none; }
 	#pagination {
 		position: fixed;
 		left: 10px;
@@ -80,7 +81,6 @@
 	var debug = '';
 	function imgloaded() {
 		$('#postlist').masonry('reload');
-		//alert($('img').width());
 	}
 	function parseposts(data) {
 		$('#postlist').empty().masonry('reload');
@@ -109,22 +109,13 @@
 	}
 
 	function markread(post) {
-		//alert('markread: '+post);
 		$.getJSON('/reader/ajax/markpost/read/'+post, function(data, textStatus, jqXHR){
 			$('#post'+data.read).addClass('postread');
 			$('#postlist').masonry('reload');
-			$('#post'+data.read+' .postfooter').bind('click', function(event) {
-				$(event.currentTarget.parentElement).find('.postcontent').show();
-				$('#postlist').masonry('reload');
-				});
-			//$('#post'+data.read+' postcontent').hide();
-			//alert(data);
-			//debug = data;
 			}
 			);
 	}
 	$(document).ready(function() {
-			//updatefeedlist();
 			$('.post').css('width', '300px');
 			$('#postlist').masonry({
 				itemSelector: '.post',
@@ -152,21 +143,16 @@
 				});
 			$('img').load(imgloaded);
 			$('a.markpost').live('click', function(event) {
-					//alert(event.currentTarget.getAttribute('href').replace('?','/').replace('=','/'));
-					//debug = event;
 					markread(event.currentTarget.getAttribute('href').split('=')[1]);
-					/*getJSON('/reader/ajax/markpost'+event.currentTarget.getAttribute('href').replace('?','/').replace('=','/'), function(data, textStatus, jqXHR){
-						$('#post'+data.read).addClass('postread');
-						$('#postlist').masonry('reload');
-						//$('#post'+data.read+' postcontent').hide();
-						//alert(data);
-						debug = data;
-						}
-						);*/
 					event.preventDefault();
 					return false;
 					}
 					);
+			$('.post .postfooter').live('click', function(event) {
+				$(event.currentTarget.parentElement).find('.postcontent').slideToggle(function() {
+					$('#postlist').masonry('reload');
+					});
+				});
 		});
 </script>
 {% endblock %}
@@ -180,6 +166,9 @@
 	</div>
 	{#<div id="feedlistcontent"></div>#}
 	{% include 'reader/feedlist.html' %}
+	<div id="feedlistfooter">
+		<a href="/reader/?all">Show all posts</a>
+	</div>
 </div>
 {% endblock %}
 

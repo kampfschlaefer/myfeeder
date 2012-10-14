@@ -13,7 +13,7 @@
 			<div style="clear: both;"></div>
 		</div>
 		<div class="postfooter ui-corner-bottom">
-			{{p.author}} on {{p.publishdate}}
+			<em>{{p.author}}</em> in <em>{{p.feed.title}}</em> on <em>{{p.publishdate}}</em>
 			–
 			{#(p.isread?'Read':'New')+' '+(p.isstarred?'Starred':'Unstarred')#}
 			{% if not p.isread %}
