@@ -2,7 +2,7 @@
 from django.conf.urls import patterns, include, url
 
 from reader.views import IndexView#, PostList
-from reader.ajaxviews import JSONFeedList, JSONPostList
+from reader.ajaxviews import JSONFeedList, JSONPostList, MarkPost
 #from django.views.generic import TemplateView
 
 urlpatterns = patterns('',
@@ -16,6 +16,8 @@ urlpatterns = patterns('',
         url(r'^category/(?P<category>\d+)$', IndexView.as_view()),
         url(r'^category/(?P<category>\d+)/page/(?P<page>\d+)$', IndexView.as_view()),
 
+        url(r'^ajax/markpost/read/(?P<read>\d+)$', MarkPost.as_view()),
+        url(r'^ajax/markpost/starred/(?P<starred>\d+)', MarkPost.as_view()),
         url(r'^ajaxfeedlist$', JSONFeedList.as_view()),
         url(r'^ajaxpostlist$', JSONPostList.as_view()),
         #url(r'^postlist$', PostList.as_view()),

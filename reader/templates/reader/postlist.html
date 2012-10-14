@@ -1,8 +1,8 @@
 <div id="postlist">
 	{% for p in postlist %}
-	<div class="post {% if p.displaywide %}wide{% endif %}" id="post'+p.id+'">
+	<div class="post {% if p.displaywide %}wide{% endif %} {% if p.isread %}postread{% endif %}" id="post{{p.id}}">
 		<div class="postheader ui-corner-top ui-widget-header">
-			<a href="{{p.link}}" target="_blank"><div class="ui-icon ui-icon-circle-arrow-e" style="float:right; border: 0px;">Goto</div>{{p.title|striptags|safe}}</a>
+			<a href="{{p.link}}" onclick="markread({{p.id}});" target="_blank"><div class="ui-icon ui-icon-circle-arrow-e" style="float:right; border: 0px;">Goto</div>{{p.title|striptags|safe}}</a>
 		</div>
 		<div class="postcontent">
 			{% if p.displaywide %}
@@ -12,7 +12,14 @@
 			{% endif %}
 			<div style="clear: both;"></div>
 		</div>
-		<div class="postfooter ui-corner-bottom">{{p.author}} on {{p.publishdate}} - {#(p.isread?'Read':'New')+' '+(p.isstarred?'Starred':'Unstarred')#}</div>
+		<div class="postfooter ui-corner-bottom">
+			{{p.author}} on {{p.publishdate}}
+			–
+			{#(p.isread?'Read':'New')+' '+(p.isstarred?'Starred':'Unstarred')#}
+			{% if not p.isread %}
+			<a class="markpost" href="?read={{p.id}}">Mark read</a>
+			{% endif %}
+		</div>
 	</div>
 	{% endfor %}
 </div>

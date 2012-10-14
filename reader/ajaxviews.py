@@ -120,3 +120,20 @@ class JSONPostList(JSONResponseMixin, View):
 
         return self.render_to_response(ret)#queryset)
 
+class MarkPost(JSONResponseMixin, View):
+    def get(self, request, *args, **kwargs):
+        print "MarkPost.get(", args, kwargs, ")"
+        postread = None
+        poststarred = None
+        ret = {}
+        if kwargs.has_key('read'):
+            postread = int(kwargs['read'])
+        if kwargs.has_key('starred'):
+            poststarred = int(kwargs['read'])
+        if postread is not None:
+            #Posting.objects.get(pk=postread).marks.add('READ')
+            PostMark(posting_id=postread, mark='READ').save()
+            ret['read'] = postread
+
+        return self.render_to_response(ret)
+
