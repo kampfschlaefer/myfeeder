@@ -23,11 +23,13 @@ def parsefeed(feed):
     #    f = Feed.objects.get(feed)
     print f
 
+    print f.url
     feed = feedparser.parse(f.url)
 
     print feed.keys()
-    print feed.entries[0].keys()
-    #print feed.entries[:2]
+    if len(feed.entries) > 0:
+        print feed.entries[0].keys()
+    print feed.entries[:2]
 
     newentries = 0
     for entry in feed.entries:
