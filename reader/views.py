@@ -1,10 +1,9 @@
 # vim: et ts=4 sw=4
 # Create your views here.
 
-from django.views.generic.list import ListView
 from django.views.generic import TemplateView
 from django.db.models import Q
-from reader.models import *
+from reader.models import Posting, Category
 
 class PostListMixin:
     def get_postlist(self, category=None, feed=None, all=False):

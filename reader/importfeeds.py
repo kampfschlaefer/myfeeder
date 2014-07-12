@@ -8,8 +8,7 @@ os.environ['DJANGO_SETTINGS_MODULE']='myfeeder.settings'
 sys.path.insert(0, '.')
 #print sys.path
 
-from reader.models import *
-from django.db import connection, transaction, utils
+from reader.models import Feed, Posting
 import feedparser, pytz, zlib
 
 def parsefeed(feed):

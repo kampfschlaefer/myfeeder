@@ -1,5 +1,5 @@
 # vim: et ts=4 sw=4
-from django.conf.urls import patterns, include, url
+from django.conf.urls import patterns, url
 
 from reader.views import IndexView#, PostList
 from reader.ajaxviews import JSONFeedList, JSONPostList, MarkPost

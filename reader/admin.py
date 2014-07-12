@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 from mptt.admin import MPTTModelAdmin
-from reader.models import *
+from reader.models import Feed, Posting, Enclosure, PostMark, Category
 
 class FeedAdmin(admin.ModelAdmin):
     list_display = ['title', 'url', 'category']
@@ -36,4 +36,3 @@ admin.site.register(Feed, FeedAdmin)
 admin.site.register(Posting, PostingAdmin)
 admin.site.register(Enclosure, EnclosureAdmin)
 admin.site.register(Category, CategoryAdmin)
-

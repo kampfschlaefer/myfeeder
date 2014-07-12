@@ -2,11 +2,11 @@
 
 from django import http
 #from django.utils import simplejson as json
-import json, datetime, re
+import json, datetime, re, calendar
 from django.db.models import Q
-from django.views.generic.list import BaseListView
+#from django.views.generic.list import BaseListView
 from django.views.generic.base import View
-from reader.models import *
+from reader.models import Feed, Category, Posting, PostMark
 
 class JSONDateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -63,6 +63,8 @@ class JSONFeedList(JSONResponseMixin, View):
             r = {'id': c.id, 'title': c.title}
             childs = self.categoriestolist(Category.objects.filter(parent=c.id))
             r['childs'] = childs
+            ret.append(r)
+        return ret
 
     def buildcategoriestree(self, catid, includefeeds=True):
         ret = []
@@ -124,12 +126,12 @@ class MarkPost(JSONResponseMixin, View):
     def get(self, request, *args, **kwargs):
         print "MarkPost.get(", args, kwargs, ")"
         postread = None
-        poststarred = None
+        #poststarred = None
         ret = {}
         if kwargs.has_key('read'):
             postread = int(kwargs['read'])
-        if kwargs.has_key('starred'):
-            poststarred = int(kwargs['read'])
+        #if kwargs.has_key('starred'):
+            #poststarred = int(kwargs['read'])
         if postread is not None:
             #Posting.objects.get(pk=postread).marks.add('READ')
             PostMark(posting_id=postread, mark='READ').save()
