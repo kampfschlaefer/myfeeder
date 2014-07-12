@@ -1,0 +1,6 @@
+Django
+django_extensions
+django_mptt
+south
+feedparser
+pytz
